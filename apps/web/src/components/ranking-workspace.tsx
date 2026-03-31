@@ -158,7 +158,7 @@ const DroppableSource = ({
   const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
-    <section className="space-y-4">
+    <section className="mt-8 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-3xl font-semibold tracking-tight">{label}</h3>
         <p className="text-base text-zinc-500 dark:text-zinc-400">
@@ -321,72 +321,60 @@ const RankingWorkspace = ({
   }, [onSubmit, state]);
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-[2rem] border border-zinc-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-zinc-950">
-        <div className="space-y-4">
-          <p className="text-2xl text-zinc-600 dark:text-zinc-300">
-            {catalog.displayUsername} / README.md
-          </p>
-          <h2 className="text-6xl font-semibold tracking-tight">
-            {catalog.displayUsername}&apos;s project tier list
-          </h2>
-          <div className="h-px bg-zinc-200 dark:bg-white/10" />
+    <section className="rounded-[2rem] border border-zinc-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-zinc-950">
+      <DndContext
+        collisionDetection={closestCenter}
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        <div className="overflow-hidden rounded-2xl border border-black/50 bg-[#0d1117]">
+          {TIERS.map((tier) => (
+            <DroppableTier
+              key={tier}
+              id={tier}
+              items={state[tier]}
+              repoMap={repoMap}
+            />
+          ))}
         </div>
 
-        <DndContext
-          collisionDetection={closestCenter}
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onDragCancel={handleDragCancel}
-        >
-          <div className="mt-8 overflow-hidden rounded-sm border border-black/50 bg-[#0d1117]">
-            {TIERS.map((tier) => (
-              <DroppableTier
-                key={tier}
-                id={tier}
-                items={state[tier]}
-                repoMap={repoMap}
-              />
-            ))}
+        <DragOverlay>
+          {activeRepo ? (
+            <RepoCard repo={activeRepo} variant="grid" showDragHandle />
+          ) : null}
+        </DragOverlay>
+
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-lg font-medium">
+              {isComplete
+                ? "Ready to submit"
+                : "Assign every repository to continue"}
+            </p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              {catalog.repos.length - state.source.length} of{" "}
+              {catalog.repos.length} repositories ranked
+            </p>
           </div>
+          <Button
+            disabled={!isComplete || isSubmitting}
+            className="h-12 rounded-full px-6 text-base"
+            onClick={handleApplyRanking}
+          >
+            {isSubmitting ? "Submitting..." : "Submit ranking"}
+          </Button>
+        </div>
 
-          <DragOverlay>
-            {activeRepo ? (
-              <RepoCard repo={activeRepo} variant="grid" showDragHandle />
-            ) : null}
-          </DragOverlay>
-
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-lg font-medium">
-                {isComplete
-                  ? "Ready to submit"
-                  : "Assign every repository to continue"}
-              </p>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                {catalog.repos.length - state.source.length} of{" "}
-                {catalog.repos.length} repositories ranked
-              </p>
-            </div>
-            <Button
-              disabled={!isComplete || isSubmitting}
-              className="h-12 rounded-full px-6 text-base"
-              onClick={handleApplyRanking}
-            >
-              {isSubmitting ? "Submitting..." : "Submit ranking"}
-            </Button>
-          </div>
-
-          <DroppableSource
-            id="source"
-            items={state.source}
-            label={sourceLabel}
-            repoMap={repoMap}
-          />
-        </DndContext>
-      </section>
-    </div>
+        <DroppableSource
+          id="source"
+          items={state.source}
+          label={sourceLabel}
+          repoMap={repoMap}
+        />
+      </DndContext>
+    </section>
   );
 };
 
