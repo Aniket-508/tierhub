@@ -9,6 +9,9 @@ import type {
 import { env } from "@tierhub/env/server";
 import { ConvexHttpClient } from "convex/browser";
 
+const BORDER_COLOR = "#30363d";
+const BORDER_WIDTH = 2;
+
 const getRepoSubtitle = (repo: RepoSnapshot) => {
   if (repo.description) {
     return repo.description;
@@ -22,11 +25,9 @@ const getRepoSubtitle = (repo: RepoSnapshot) => {
 };
 
 const TierImage = ({
-  displayUsername,
   repos,
   tiers,
 }: {
-  displayUsername: string;
   repos: RepoSnapshot[];
   tiers: TierBuckets;
 }) => {
@@ -35,137 +36,111 @@ const TierImage = ({
   return (
     <div
       style={{
-        background: "#f8fafc",
-        color: "#18181b",
+        backgroundColor: "#0d1117",
+        borderColor: BORDER_COLOR,
+        borderStyle: "solid",
+        borderWidth: BORDER_WIDTH,
         display: "flex",
         flexDirection: "column",
         fontFamily: "sans-serif",
         height: "100%",
-        padding: 36,
         width: "100%",
       }}
     >
-      <div
-        style={{
-          background: "white",
-          border: "1px solid rgba(24, 24, 27, 0.12)",
-          borderRadius: 28,
-          display: "flex",
-          flexDirection: "column",
-          gap: 22,
-          padding: 30,
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          <div style={{ color: "#52525b", fontSize: 28 }}>
-            {displayUsername} / README.md
-          </div>
+      {TIERS.map((tier) => (
+        <div
+          key={tier}
+          style={{
+            display: "flex",
+            flex: 1,
+            position: "relative",
+            width: "100%",
+          }}
+        >
           <div
-            style={{ fontSize: 62, fontWeight: 700, letterSpacing: "-0.04em" }}
+            style={{
+              alignItems: "center",
+              backgroundColor: TIER_STYLES[tier].accent,
+              display: "flex",
+              height: "100%",
+              justifyContent: "center",
+              width: 160,
+            }}
           >
-            {displayUsername}&apos;s project tier list
+            <span style={{ color: "#0f172a", fontSize: 64, fontWeight: 500 }}>
+              {tier}
+            </span>
           </div>
           <div
             style={{
-              background: "rgba(24, 24, 27, 0.12)",
-              height: 1,
-              width: "100%",
+              alignItems: "center",
+              display: "flex",
+              flex: 1,
+              flexWrap: "wrap",
+              gap: 18,
+              padding: 24,
             }}
-          />
-        </div>
+          >
+            {tiers[tier].map((repoName) => {
+              const repo = repoMap.get(repoName);
+              if (!repo) {
+                return null;
+              }
 
-        <div
-          style={{
-            background: "#0d1117",
-            border: "1px solid rgba(0,0,0,0.65)",
-            display: "flex",
-            flexDirection: "column",
-            overflow: "hidden",
-          }}
-        >
-          {TIERS.map((tier) => (
+              return (
+                <div
+                  key={repo.name}
+                  style={{
+                    backgroundColor: "#1e2329",
+                    borderColor: "#2a2f36",
+                    borderStyle: "solid",
+                    borderWidth: 1,
+                    color: "white",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 10,
+                    minWidth: 320,
+                    padding: "18px 22px",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 28,
+                      fontWeight: 600,
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {repo.name}
+                  </div>
+                  <div
+                    style={{
+                      color: "#d4d4d8",
+                      fontSize: 18,
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {getRepoSubtitle(repo)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {tier !== "D" && (
             <div
-              key={tier}
               style={{
-                borderBottom:
-                  tier === "D" ? "none" : "1px solid rgba(255,255,255,0.08)",
-                display: "flex",
-                minHeight: 160,
+                backgroundColor: BORDER_COLOR,
+                bottom: 0,
+                height: BORDER_WIDTH,
+                left: 0,
+                position: "absolute",
+                right: 0,
                 width: "100%",
+                zIndex: 1,
               }}
-            >
-              <div
-                style={{
-                  alignItems: "center",
-                  background: TIER_STYLES[tier].accent,
-                  borderRight: "1px solid rgba(0,0,0,0.65)",
-                  color: "#0f172a",
-                  display: "flex",
-                  fontSize: 64,
-                  fontWeight: 700,
-                  justifyContent: "center",
-                  width: 160,
-                }}
-              >
-                {tier}
-              </div>
-              <div
-                style={{
-                  alignItems: "flex-start",
-                  display: "flex",
-                  flex: 1,
-                  flexWrap: "wrap",
-                  gap: 18,
-                  padding: 24,
-                }}
-              >
-                {tiers[tier].map((repoName) => {
-                  const repo = repoMap.get(repoName);
-                  if (!repo) {
-                    return null;
-                  }
-
-                  return (
-                    <div
-                      key={repo.name}
-                      style={{
-                        background: "rgba(255,255,255,0.12)",
-                        border: "1px solid rgba(255,255,255,0.06)",
-                        color: "white",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 10,
-                        minHeight: 108,
-                        minWidth: 320,
-                        padding: "18px 22px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: 28,
-                          fontWeight: 700,
-                          lineHeight: 1.1,
-                        }}
-                      >
-                        {repo.name}
-                      </div>
-                      <div
-                        style={{
-                          color: "#d4d4d8",
-                          fontSize: 18,
-                          lineHeight: 1.35,
-                        }}
-                      >
-                        {getRepoSubtitle(repo)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+            />
+          )}
         </div>
-      </div>
+      ))}
     </div>
   );
 };
@@ -191,11 +166,7 @@ export const Route = createFileRoute("/tier-image")({
         }
 
         return new ImageResponse(
-          <TierImage
-            displayUsername={catalog.displayUsername}
-            repos={catalog.repos}
-            tiers={tiers}
-          />,
+          <TierImage repos={catalog.repos} tiers={tiers} />,
           {
             height: 1080,
             width: 1600,
