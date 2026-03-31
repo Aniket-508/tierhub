@@ -3,6 +3,8 @@ import { Button } from "@tierhub/ui/components/button";
 import { Input } from "@tierhub/ui/components/input";
 import { useCallback, useState } from "react";
 
+import { SITE } from "@/constants/site";
+
 const HomeComponent = () => {
   const navigate = useNavigate({ from: "/" });
   const [username, setUsername] = useState("");
@@ -103,7 +105,7 @@ const HomeComponent = () => {
             ))}
           </div>
           <pre className="overflow-x-auto rounded-2xl border border-zinc-200 bg-zinc-50 p-4 text-sm text-zinc-600 dark:border-white/10 dark:bg-black/30 dark:text-zinc-300">
-            ![Tier List](https://yourapp.com/tier-image?username=your-handle)
+            ![Tier List]({SITE.URL}/tier-image?username=your-handle)
           </pre>
         </div>
       </section>
